@@ -34,22 +34,27 @@ class Body extends StatelessWidget {
             children: [
               const ProgressBar(),
               const SizedBox(height: 8),
-              Obx(
-                () =>  Text.rich(TextSpan(
-                  text: "Question ${_questionController.questionNumber.value}",
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline4
-                      ?.copyWith(color: Colors.black),
-                  children: [
-                    TextSpan(
-                      text: "/${_questionController.questions.length}",
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Obx(
+                    () =>  Text.rich(TextSpan(
+                      text: "Question ${_questionController.questionNumber.value}",
                       style: Theme.of(context)
                           .textTheme
-                          .headline5
+                          .headline4
                           ?.copyWith(color: Colors.black),
-                    )
-                  ])),
+                      children: [
+                        TextSpan(
+                          text: "/${_questionController.questions.length}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline5
+                              ?.copyWith(color: Colors.black),
+                        )
+                      ])),
+                  ),
+                ],
               ),
               const Divider(
                 thickness: 1.5,

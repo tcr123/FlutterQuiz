@@ -2,13 +2,13 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:quiz/model/Question.dart';
+import 'package:quiz/quiz/QuizScreen.dart';
 
 // We use get package for our state management
 
 class QuestionController extends GetxController
     with GetSingleTickerProviderStateMixin {
   // Lets animated our progress bar
-
   late AnimationController _animationController;
   late Animation _animation;
   // so that we can access our animation outside
@@ -31,6 +31,9 @@ class QuestionController extends GetxController
   bool _isAnswered = false;
   bool get isAnswered => this._isAnswered;
 
+  bool _isCorrect = false;
+  bool get isCorrect => this._isCorrect;
+
   late List<int> _correctAns = [];
   List<int> get correctAns => this._correctAns;
 
@@ -47,17 +50,15 @@ class QuestionController extends GetxController
   @override
   void onInit() {
     _animationController =
-        AnimationController(duration: Duration(seconds: 2), vsync: this);
-    _animation = Tween<double>(
-            begin: 0,
-            end: 1.0)
-        .animate(_animationController)
+        AnimationController(duration: Duration(milliseconds: 500), vsync: this);
+    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController)
       ..addListener(() {
         // update like setState
         update();
       });
 
     _animationController.forward();
+
     _pageController = PageController();
     super.onInit();
   }
@@ -65,14 +66,10 @@ class QuestionController extends GetxController
   @override
   void onClose() {
     super.onClose();
-    _animationController.dispose();
     _pageController.dispose();
   }
 
   void checkSelectedAns(int selectedIndex, bool mutiple) {
-
-    print(_selectedAns);
-
     if (mutiple) {
       if (!_selectedAns.contains(selectedIndex)) {
         _selectedAns.add(selectedIndex);
@@ -83,6 +80,8 @@ class QuestionController extends GetxController
       _selectedAns.clear();
       _selectedAns.add(selectedIndex);
     }
+
+    update();
   }
 
   void checkAns(Question question) {
@@ -91,32 +90,41 @@ class QuestionController extends GetxController
       _correctAns = question.answer;
       _selectedAns = selectedAns;
 
-      bool correct = true;
-      if (_correctAns[0] == _selectedAns[0]) _numOfCorrectAns++;
+      _isCorrect = true;
 
       for (int i = 0; i < _selectedAns.length; i++) {
         if (!_correctAns.contains(_selectedAns.length)) {
-          correct = false;
+          _isCorrect = false;
           break;
         }
       }
 
-      if (_correctAns.length != _selectedAns.length) correct = false;
+      if (_correctAns.length != _selectedAns.length) _isCorrect = false;
 
-      print(selectedAns);
+      if (isCorrect) {
+        _numOfCorrectAns++;
 
-      if (correct) _numOfCorrectAns++;
+        Future.delayed(Duration(seconds: 3), () {
+          nextQuestion();
+        });
+      }
 
-      _animationController.stop();
       update();
     } else {
       _isAnswered = true;
       _correctAns = question.answer;
       _selectedAns = selectedAns;
+      _isCorrect = false;
 
-      if (_correctAns[0] == _selectedAns[0]) _numOfCorrectAns++;
+      if (_correctAns[0] == _selectedAns[0]) {
+        _isCorrect = true;
+        _numOfCorrectAns++;
 
-      _animationController.stop();
+        Future.delayed(Duration(seconds: 3), () {
+          nextQuestion();
+        });
+      }
+
       update();
     }
   }
@@ -125,10 +133,10 @@ class QuestionController extends GetxController
     _selectedAns.clear();
 
     if (_questionNumber.value != _questions.length) {
+      _isCorrect = false;
       _isAnswered = false;
       _pageController.nextPage(
           duration: Duration(milliseconds: 250), curve: Curves.ease);
-
       _animationController.reset();
       _animationController.forward();
     } else {}

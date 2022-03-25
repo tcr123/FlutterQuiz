@@ -7,12 +7,14 @@ class Option extends StatelessWidget {
     required this.option,
     required this.index,
     required this.press,
+    required this.mutiple,
     Key? key,
   }) : super(key: key);
 
   final String option;
   final int index;
   final VoidCallback press;
+  final bool mutiple;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +68,7 @@ class Option extends StatelessWidget {
                               ? Colors.transparent
                               : getTheRightColor(),
                           border: Border.all(color: getTheRightColor()),
-                          borderRadius: BorderRadius.circular(50)),
+                          borderRadius: mutiple ? BorderRadius.circular(0) : BorderRadius.circular(50)),
                       child: getTheRightColor() == Colors.grey
                           ? null
                           : Icon(getTheRightIcon(), size: 16)),

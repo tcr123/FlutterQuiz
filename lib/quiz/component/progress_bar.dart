@@ -19,15 +19,11 @@ class ProgressBar extends StatelessWidget {
       child: GetBuilder<QuestionController>(
           init: QuestionController(),
           builder: (controller) {
-            print(controller.animation.value);
-            print(controller.questionNumber.value);
             return Stack(
               children: [
                 LayoutBuilder(
                     builder: (context, constraints) => Container(
-                          width: constraints.maxWidth *
-                              controller.animation.value /
-                              controller.questions.length * controller.questionNumber.value,
+                          width: constraints.maxWidth * controller.animation.value / controller.questions.length * controller.questionNumber.value,
                           decoration: BoxDecoration(
                               gradient: const LinearGradient(colors: [
                                 Color.fromARGB(255, 0, 182, 61),
@@ -43,7 +39,7 @@ class ProgressBar extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                            "${(controller.animation.value * 100  * controller.questionNumber.value / controller.questions.length).round()} %"),
+                            "${(100 / controller.questions.length * controller.animation.value * controller.questionNumber.value).round()} %"),
                         Icon(Icons.flag)
                       ],
                     ),
