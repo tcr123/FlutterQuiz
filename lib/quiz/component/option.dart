@@ -21,13 +21,18 @@ class Option extends StatelessWidget {
         builder: (qnController) {
           Color getTheRightColor() {
             if (qnController.isAnswered) {
-              if (index == qnController.correctAns) {
+              if (qnController.correctAns.contains(index)) {
                 return Colors.green;
-              } else if (index == qnController.selectedAns &&
-                  index != qnController.correctAns) {
+              } else if (qnController.selectedAns.contains(index) &&
+                  !qnController.correctAns.contains(index)) {
                 return Colors.red;
               }
+            } else {
+              if (qnController.selectedAns.contains(index)) {
+                return Colors.blue;
+              }
             }
+
             return Colors.grey;
           }
 
@@ -36,30 +41,35 @@ class Option extends StatelessWidget {
           }
 
           return InkWell(
-            onTap: qnController.isAnswered ? null : press,
+            onTap: press,
             child: Container(
               margin: const EdgeInsets.only(top: 20),
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                  border: Border.all(color: getTheRightColor() ),
+                  border: Border.all(color: getTheRightColor()),
                   borderRadius: BorderRadius.circular(15)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    option,
-                    style: TextStyle(color: getTheRightColor() , fontSize: 16),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: Text(
+                      option,
+                      style: TextStyle(color: getTheRightColor(), fontSize: 16),
+                    ),
                   ),
                   Container(
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      color: getTheRightColor() == Colors.grey ? Colors.transparent : getTheRightColor(),
-                      border: Border.all(color: getTheRightColor() ),
-                      borderRadius: BorderRadius.circular(50)
-                    ),
-                    child: getTheRightColor() == Colors.grey ? null : Icon(getTheRightIcon(), size: 16)
-                  ),
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                          color: getTheRightColor() == Colors.grey
+                              ? Colors.transparent
+                              : getTheRightColor(),
+                          border: Border.all(color: getTheRightColor()),
+                          borderRadius: BorderRadius.circular(50)),
+                      child: getTheRightColor() == Colors.grey
+                          ? null
+                          : Icon(getTheRightIcon(), size: 16)),
                 ],
               ),
             ),

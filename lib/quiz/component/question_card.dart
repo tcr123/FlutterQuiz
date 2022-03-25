@@ -28,13 +28,35 @@ class QuestionCard extends StatelessWidget {
                     .textTheme
                     .headline6
                     ?.copyWith(color: Colors.black)),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
-            ...List.generate(question.options.length, (index) => Option(
-              option: question.options[index], index: index, press: () => _controller.checkAns(question, index),
-              ))
-          ],
+            ...List.generate(
+                question.options.length,
+                (index) => Option(
+                      option: question.options[index],
+                      index: index,
+                      press: () {
+                        _controller.checkSelectedAns(index, question.mutiple);
+                      },
+                    )),
+            const SizedBox(
+              height: 24,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (!_controller.selectedAns.isEmpty)
+                      _controller.checkAns(question);
+                  },
+                  child: const Text("Submit"),
+                  style: ElevatedButton.styleFrom(primary: Colors.green[600]),
+                )
+              ],
+            ),
+          ]
         ),
       ),
     );

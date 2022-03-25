@@ -22,6 +22,7 @@ class QuestionController extends GetxController
           id: e['id'],
           question: e['question'],
           answer: e['answer_index'],
+          mutiple: e['mutiple'],
           options: e['options']))
       .toList();
 
@@ -30,11 +31,11 @@ class QuestionController extends GetxController
   bool _isAnswered = false;
   bool get isAnswered => this._isAnswered;
 
-  late int _correctAns;
-  int get correctAns => this._correctAns;
+  late List<int> _correctAns = [];
+  List<int> get correctAns => this._correctAns;
 
-  late int _selectedAns;
-  int get selectedAns => this._selectedAns;
+  late List<int> _selectedAns = [];
+  List<int> get selectedAns => this._selectedAns;
 
   RxInt _questionNumber = 1.obs;
   RxInt get questionNumber => this._questionNumber;
@@ -45,18 +46,17 @@ class QuestionController extends GetxController
   // called immediately after the widget is allocated memory
   @override
   void onInit() {
-    // Our animation duration is 60 s
-    // so our plan is to fill the progress bar within 60s
     _animationController =
-        AnimationController(duration: Duration(seconds: 60), vsync: this);
-    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController)
+        AnimationController(duration: Duration(seconds: 2), vsync: this);
+    _animation = Tween<double>(
+            begin: 0,
+            end: 1.0)
+        .animate(_animationController)
       ..addListener(() {
         // update like setState
         update();
       });
 
-    // start our animation
-    // Once 60s is completed go to the next qn
     _animationController.forward();
     _pageController = PageController();
     super.onInit();
@@ -69,32 +69,69 @@ class QuestionController extends GetxController
     _pageController.dispose();
   }
 
-  void checkAns(Question question, int selectedIndex) {
-    _isAnswered = true;
-    _correctAns = question.answer;
-    _selectedAns = selectedIndex;
+  void checkSelectedAns(int selectedIndex, bool mutiple) {
 
-    if (_correctAns == _selectedAns) _numOfCorrectAns++;
+    print(_selectedAns);
 
-    _animationController.stop();
-    update();
+    if (mutiple) {
+      if (!_selectedAns.contains(selectedIndex)) {
+        _selectedAns.add(selectedIndex);
+      } else {
+        _selectedAns.remove(selectedIndex);
+      }
+    } else {
+      _selectedAns.clear();
+      _selectedAns.add(selectedIndex);
+    }
+  }
 
-    Future.delayed(Duration(seconds: 3), () {
-      nextQuestion();
-    });
+  void checkAns(Question question) {
+    if (question.mutiple) {
+      _isAnswered = true;
+      _correctAns = question.answer;
+      _selectedAns = selectedAns;
+
+      bool correct = true;
+      if (_correctAns[0] == _selectedAns[0]) _numOfCorrectAns++;
+
+      for (int i = 0; i < _selectedAns.length; i++) {
+        if (!_correctAns.contains(_selectedAns.length)) {
+          correct = false;
+          break;
+        }
+      }
+
+      if (_correctAns.length != _selectedAns.length) correct = false;
+
+      print(selectedAns);
+
+      if (correct) _numOfCorrectAns++;
+
+      _animationController.stop();
+      update();
+    } else {
+      _isAnswered = true;
+      _correctAns = question.answer;
+      _selectedAns = selectedAns;
+
+      if (_correctAns[0] == _selectedAns[0]) _numOfCorrectAns++;
+
+      _animationController.stop();
+      update();
+    }
   }
 
   void nextQuestion() {
+    _selectedAns.clear();
+
     if (_questionNumber.value != _questions.length) {
       _isAnswered = false;
       _pageController.nextPage(
           duration: Duration(milliseconds: 250), curve: Curves.ease);
 
       _animationController.reset();
-      _animationController.forward().whenComplete(nextQuestion);
-    } else {
-      
-    }
+      _animationController.forward();
+    } else {}
   }
 
   void updateTheQnNum(int index) {
